@@ -37,7 +37,7 @@ const eventSchema = new mongoose.Schema(
       required: true,
     },
     endTime: {
-      type: date,
+      type: Date,
       requierd: true,
     },
     registrationType: {

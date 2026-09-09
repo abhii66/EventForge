@@ -4,7 +4,9 @@ import { connect } from "mongoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import {userApp} from './APIs/UserAPI.js'
-//import {eventApp} from './APIs/EventAPI.js'
+import {eventApp} from './APIs/EventAPI.js'
+import {registerApp} from './APIs/RegistrationAPI.js'
+import {ticketApp} from './APIs/TicketAPI.js'
 
 config();
 const app = exp();
@@ -30,7 +32,9 @@ app.use(
 app.use(exp.json());
 app.use(cookieParser());
 app.use('/user-api', userApp)
-// app.use('/event-api', eventApp)
+app.use('/event-api', eventApp)
+app.use('/register-api', registerApp)
+app.use('/ticket-api', ticketApp)
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });

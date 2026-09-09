@@ -1,5 +1,6 @@
 import exp from "express";
 import { EventModel } from "../models/EventModel.js";
+import {isAuthenticated, authorizeRoles} from '../middleware/verifyToken.js'
 
 export const eventApp = exp.Router();
 
@@ -7,7 +8,7 @@ export const eventApp = exp.Router();
 eventApp.post(
   "/create",
   isAuthenticated,
-  authorizedRoles("organizer", "admin"),
+  authorizeRoles("organizer", "admin"),
   async (req, res) => {
     try {
       const event = new EventModel({
