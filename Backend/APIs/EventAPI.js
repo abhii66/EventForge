@@ -9,7 +9,7 @@ import { escapeRegex } from '../helpers/escapeRegex.js'
 // checkers, status) is controlled by the server — otherwise an organizer could POST
 // { registeredCount: 0 } and reopen a sold-out event, or reassign someone else's event.
 const EDITABLE = ['title', 'description', 'category', 'tags', 'venue', 'city',
-    'startTime', 'endTime', 'registrationType', 'teamSize', 'capacity', 'price']
+    'startTime', 'endTime', 'registrationType', 'teamSize', 'capacity', 'price', 'location']
 const pickEditable = (body) =>
     Object.fromEntries(EDITABLE.filter(k => body[k] !== undefined).map(k => [k, body[k]]))
 
@@ -60,6 +60,63 @@ eventApp.get('/organizer/my', isAuthenticated, authorizeRoles('organizer', 'admi
         res.json(events)
     } catch (err) {
         res.status(500).json({ message: 'Failed to fetch your events', error: err.message })
+    }
+})
+
+// must stay above /:id — same reason as /organizer/my
+eventApp.get('/nearby', async (req, res) => {
+    try {
+        const { lat, lng, radiusKm = 15 } = req.query
+        if (lat === undefined || lng === undefined) {
+            return res.status(400).json({ message: 'lat and lng are required' })
+        }
+
+        const events = await EventModel.find({
+            status: 'published',
+            location: {
+                $near: {
+                    $geometry: { type: 'Point', coordinates: [Number(lng), Number(lat)] },
+                    $maxDistance: Number(radiusKm) * 1000
+                }
+            }
+        }).populate('organizer', 'name email')
+
+        res.json({ events })
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch nearby events', error: err.message })
+    }
+})
+
+// .ics download — public, so anyone with the event link can add it to their calendar
+eventApp.get('/:id/ics', async (req, res) => {
+    try {
+        const event = await EventModel.findById(req.params.id)
+        if (!event) return res.status(404).json({ message: 'Event not found' })
+
+        const fmt = (d) => new Date(d).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
+        const escapeText = (s) => String(s).replace(/([,;])/g, '\\$1').replace(/\n/g, '\\n')
+
+        const ics = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//EventForge//EN',
+            'BEGIN:VEVENT',
+            `UID:${event._id}@eventforge`,
+            `DTSTAMP:${fmt(new Date())}`,
+            `DTSTART:${fmt(event.startTime)}`,
+            `DTEND:${fmt(event.endTime)}`,
+            `SUMMARY:${escapeText(event.title)}`,
+            `DESCRIPTION:${escapeText(event.description)}`,
+            `LOCATION:${escapeText(`${event.venue}, ${event.city}`)}`,
+            'END:VEVENT',
+            'END:VCALENDAR'
+        ].join('\r\n')
+
+        res.setHeader('Content-Type', 'text/calendar')
+        res.setHeader('Content-Disposition', `attachment; filename="${event.title.replace(/\s+/g, '_')}.ics"`)
+        res.send(ics)
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to generate calendar file', error: err.message })
     }
 })
 

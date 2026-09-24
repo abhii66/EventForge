@@ -10,7 +10,7 @@ export default function CreateEvent() {
   const [form, setForm] = useState({
     title: '', description: '', category: '', tags: '', venue: '', city: '',
     startTime: '', endTime: '', capacity: '', registrationType: 'individual',
-    teamMin: '', teamMax: ''
+    teamMin: '', teamMax: '', lat: '', lng: ''
   })
   const [error, setError] = useState('')
   const navigate = useNavigate()
@@ -24,7 +24,10 @@ export default function CreateEvent() {
         ...form,
         tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
         capacity: Number(form.capacity),
-        teamSize: { min: Number(form.teamMin) || 1, max: Number(form.teamMax) || 1 }
+        teamSize: { min: Number(form.teamMin) || 1, max: Number(form.teamMax) || 1 },
+        location: form.lat && form.lng
+          ? { type: 'Point', coordinates: [Number(form.lng), Number(form.lat)] }
+          : undefined
       })
       navigate('/organizer')
     } catch (err) {
@@ -58,6 +61,20 @@ export default function CreateEvent() {
           <div className="grid grid-cols-2 gap-3">
             <input placeholder="Venue" value={form.venue} onChange={set('venue')} className={inputClass} />
             <input placeholder="City" value={form.city} onChange={set('city')} className={inputClass} />
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigator.geolocation.getCurrentPosition(
+                (pos) => setForm(f => ({ ...f, lat: pos.coords.latitude, lng: pos.coords.longitude })),
+                () => setError('Could not get your location')
+              )}
+              className="text-xs font-semibold text-teal"
+            >
+              📍 Use my current location
+            </button>
+            {form.lat && <p className="text-xs text-ink/40">Location set ✓ (powers "near me" search)</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-3">

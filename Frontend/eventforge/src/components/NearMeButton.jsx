@@ -1,7 +1,5 @@
-// src/components/NearMeButton.jsx
 import { useState } from 'react'
 import api from '../api/axios'
-import EventCard from './EventCard'
 
 export default function NearMeButton({ onResults }) {
   const [loading, setLoading] = useState(false)

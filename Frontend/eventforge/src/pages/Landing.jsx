@@ -1,4 +1,3 @@
-// src/pages/Landing.jsx — updated to support the near-me override
 import { useEffect, useState } from 'react'
 import NavBar from '../components/NavBar'
 import Hero from '../components/Hero'

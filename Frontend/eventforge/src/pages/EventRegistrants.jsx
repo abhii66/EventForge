@@ -52,6 +52,12 @@ export default function EventRegistrants() {
                 Start event
               </button>
             )}
+            <Link to={`/organizer/events/${id}/analytics`} className="bg-white border border-ink/15 px-5 py-2.5 rounded-lg font-semibold text-sm">
+              Analytics
+            </Link>
+            <Link to={`/organizer/events/${id}/edit`} className="bg-white border border-ink/15 px-5 py-2.5 rounded-lg font-semibold text-sm">
+              Edit
+            </Link>
             <Link to="/organizer/scan" className="bg-ink text-white px-5 py-2.5 rounded-lg font-semibold text-sm">
               Scan tickets
             </Link>

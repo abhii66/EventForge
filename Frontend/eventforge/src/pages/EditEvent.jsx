@@ -23,7 +23,7 @@ export default function EditEvent() {
       const e = res.data.event
       setForm({
         title: e.title, description: e.description, category: e.category,
-        venue: e.venue, city: e.city,
+        tags: (e.tags || []).join(', '), venue: e.venue, city: e.city,
         startTime: toLocalInput(e.startTime), endTime: toLocalInput(e.endTime),
         capacity: e.capacity, registrationType: e.registrationType,
         teamMin: e.teamSize?.min ?? 1, teamMax: e.teamSize?.max ?? 1
@@ -40,6 +40,7 @@ export default function EditEvent() {
     try {
       await api.put(`/event-api/${id}`, {
         ...form,
+        tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
         capacity: Number(form.capacity),
         teamSize: { min: Number(form.teamMin) || 1, max: Number(form.teamMax) || 1 }
       })
@@ -50,7 +51,7 @@ export default function EditEvent() {
   }
 
   const cancelEvent = async () => {
-    if (!confirm('Cancel this event? Registered participants will still see their tickets, but the event drops off discovery.')) return
+    if (!confirm('Cancel this event? Registered participants keep their tickets, but it drops off discovery.')) return
     try {
       await api.delete(`/event-api/${id}`)
       navigate('/organizer')
@@ -72,6 +73,7 @@ export default function EditEvent() {
           <input placeholder="Title" value={form.title} onChange={set('title')} className={inputClass} />
           <textarea placeholder="Description" value={form.description} onChange={set('description')} className={inputClass} rows={4} />
           <input placeholder="Category" value={form.category} onChange={set('category')} className={inputClass} />
+          <input placeholder="Tags, comma-separated" value={form.tags} onChange={set('tags')} className={inputClass} />
 
           <div className="grid grid-cols-2 gap-3">
             <input placeholder="Venue" value={form.venue} onChange={set('venue')} className={inputClass} />
@@ -85,7 +87,7 @@ export default function EditEvent() {
 
           <div className="grid grid-cols-2 gap-3">
             <input type="number" placeholder="Capacity" value={form.capacity} onChange={set('capacity')} className={inputClass} />
-            <select value={form.registrationType} onChange={set('registrationType')} className={inputClass} disabled>
+            <select value={form.registrationType} className={inputClass} disabled>
               <option value="individual">Individual</option>
               <option value="team">Team</option>
             </select>

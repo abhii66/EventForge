@@ -64,7 +64,9 @@ export default function EventDetail() {
         <h1 className="font-display font-bold text-4xl mt-2 mb-3">{event.title}</h1>
         <p className="text-ink/60 mb-1">{new Date(event.startTime).toLocaleString()} · {event.venue}, {event.city}</p>
         {event.tags?.length > 0 && <p className="text-xs text-ink/50 mb-1">{event.tags.map(t => `#${t}`).join(' ')}</p>}
-        <p className="text-sm font-semibold mb-6">{full ? 'Sold out' : `${event.capacity - event.registeredCount} seats left`}</p>
+        <p className="text-sm font-semibold mb-2">{full ? 'Sold out' : `${event.capacity - event.registeredCount} seats left`}</p>
+        <a href={`${api.defaults.baseURL}/event-api/${id}/ics`} className="text-xs font-semibold text-teal">+ Add to calendar</a>
+        <div className="mb-4"></div>
         <p className="text-ink/80 leading-relaxed mb-8">{event.description}</p>
 
         {!user ? (

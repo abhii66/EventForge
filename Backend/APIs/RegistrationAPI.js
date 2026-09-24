@@ -231,6 +231,40 @@ registerApp.patch('/:id/priority', isAuthenticated, authorizeRoles('organizer', 
     }
 })
 
+// GET /register-api/event/:eventId/analytics — organizer's registration stats + signup trend
+registerApp.get('/event/:eventId/analytics', isAuthenticated, authorizeRoles('organizer', 'admin'), async (req, res) => {
+    try {
+        const event = await EventModel.findById(req.params.eventId)
+        if (!event) return res.status(404).json({ message: 'Event not found' })
+        if (!isOwner(event, req.user)) return res.status(403).json({ message: 'Not your event' })
+
+        const all = await RegistrationModel.find({ event: req.params.eventId }).select('status registeredAt').lean()
+
+        const counts = { confirmed: 0, waitlisted: 0, cancelled: 0 }
+        all.forEach(r => counts[r.status]++)
+
+        // group by calendar day for a simple signups-over-time trend
+        const byDay = {}
+        all.forEach(r => {
+            const day = r.registeredAt.toISOString().slice(0, 10)
+            byDay[day] = (byDay[day] || 0) + 1
+        })
+        const dailySignups = Object.entries(byDay)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([date, count]) => ({ date, count }))
+
+        res.json({
+            total: all.length,
+            ...counts,
+            capacity: event.capacity,
+            utilization: event.capacity ? Math.round((counts.confirmed / event.capacity) * 100) : 0,
+            dailySignups
+        })
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch analytics', error: err.message })
+    }
+})
+
 // GET /register-api/my — logged-in user's own registrations (individual + teams they lead)
 registerApp.get('/my', isAuthenticated, async (req, res) => {
     try {

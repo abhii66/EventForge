@@ -1,4 +1,3 @@
-// src/pages/EventAnalytics.jsx
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
