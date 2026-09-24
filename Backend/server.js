@@ -1,14 +1,18 @@
+import 'dotenv/config'
 import exp from "express";
-import { config } from "dotenv";
+// import { config } from "dotenv";
 import { connect } from "mongoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import {userApp} from './APIs/UserAPI.js'
-import {eventApp} from './APIs/EventAPI.js'
-import {registerApp} from './APIs/RegistrationAPI.js'
-import {ticketApp} from './APIs/TicketAPI.js'
+import { userApp } from "./APIs/UserAPI.js";
+import { eventApp } from "./APIs/EventAPI.js";
+import { registerApp } from "./APIs/RegistrationAPI.js";
+import { ticketApp } from "./APIs/TicketAPI.js";
+import { feedbackApp } from "./APIs/FeedbackAPI.js";
+import { recommendApp } from "./APIs/RecommendationAPI.js";
+import { aiApp } from "./APIs/AIContentAPI.js";
 
-config();
+// config();
 const app = exp();
 
 app.use(
@@ -31,10 +35,13 @@ app.use(
 
 app.use(exp.json());
 app.use(cookieParser());
-app.use('/user-api', userApp)
-app.use('/event-api', eventApp)
-app.use('/register-api', registerApp)
-app.use('/ticket-api', ticketApp)
+app.use("/user-api", userApp);
+app.use("/event-api", eventApp);
+app.use("/register-api", registerApp);
+app.use("/ticket-api", ticketApp);
+app.use("/feedback-api", feedbackApp);
+app.use("/recommend-api", recommendApp);
+app.use("/ai-api", aiApp);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });

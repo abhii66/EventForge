@@ -1,0 +1,14 @@
+/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,900&family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #F2EFE6;
+  --color-ink: #1B1F1C;
+  --color-teal: #0F6B52;
+  --color-amber: #D98F3B;
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+body { @apply bg-cream text-ink font-body; }
