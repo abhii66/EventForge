@@ -183,3 +183,8 @@ A taste profile is built from stated interests and attended events, weighted by 
 - Organizer verification and trust badges
 - Notifications (email / in-app) for reminders and waitlist promotions
 - Shared cache for multi-instance search
+
+mongodb+srv://abhi66:abhii0821K4@blogg.n9qclqd.mongodb.net/eventForgeDB?retryWrites=true&w=majority
+
+mongodb+srv://abhi66:abhii0821K4@ac-cbobfya.n9qclqd.mongodb.net/eventForgeDB?retryWrites=true&w=majority
+
