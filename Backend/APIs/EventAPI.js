@@ -87,6 +87,17 @@ eventApp.get('/nearby', async (req, res) => {
     }
 })
 
+eventApp.get('/my-volunteering', isAuthenticated, async (req, res) => {
+    try {
+        const events = await EventModel.find({ checkers: req.user.id })
+            .select('title startTime endTime venue city status')
+            .sort({ startTime: 1 })
+        res.json({ events })
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch your volunteering events', error: err.message })
+    }
+})
+
 // .ics download — public, so anyone with the event link can add it to their calendar
 eventApp.get('/:id/ics', async (req, res) => {
     try {

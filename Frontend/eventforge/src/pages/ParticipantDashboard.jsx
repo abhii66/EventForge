@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import api from '../api/axios'
 import NavBar from '../components/NavBar'
 import TicketQR from '../components/TicketQR'
@@ -6,9 +7,14 @@ import TicketQR from '../components/TicketQR'
 export default function ParticipantDashboard() {
   const [registrations, setRegistrations] = useState([])
   const [openId, setOpenId] = useState(null)
+  const [volunteering, setVolunteering] = useState([])
 
   useEffect(() => {
     api.get('/register-api/my').then(res => setRegistrations(res.data))
+  }, [])
+
+  useEffect(() => {
+    api.get('/event-api/my-volunteering').then(res => setVolunteering(res.data.events)).catch(() => {})
   }, [])
 
   const [error, setError] = useState('')
@@ -54,6 +60,24 @@ export default function ParticipantDashboard() {
           </div>
           {interestsMsg && <p className="text-xs mt-2 text-teal">{interestsMsg}</p>}
         </div>
+
+        {volunteering.length > 0 && (
+          <div className="bg-white rounded-xl p-5 shadow-[0_8px_20px_rgba(27,31,28,.06)] mb-8">
+            <h3 className="font-display font-bold text-lg mb-1">You're volunteering</h3>
+            <p className="text-xs text-ink/50 mb-3">An organizer has added you as a ticket checker for these events.</p>
+            <div className="space-y-3">
+              {volunteering.map(e => (
+                <div key={e._id} className="flex justify-between items-center">
+                  <div>
+                    <p className="font-semibold text-sm">{e.title}</p>
+                    <p className="text-xs text-ink/50">{new Date(e.startTime).toLocaleString()} · {e.venue}</p>
+                  </div>
+                  <Link to="/organizer/scan" className="text-sm text-teal font-semibold">Scan tickets</Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
 
