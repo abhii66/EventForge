@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function Hero() {
@@ -10,6 +10,13 @@ export default function Hero() {
     if (user.role === 'organizer') return navigate('/organizer/create')
     await becomeOrganizer()
     navigate('/organizer/create')
+  }
+
+  const handleFindEvent = () => {
+    document.getElementById('events')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    })
   }
 
   return (
@@ -30,11 +37,21 @@ export default function Hero() {
       </p>
 
       <div className="flex gap-3.5 mt-7">
-        <a href="#events" className="bg-ink text-white px-5 py-2.5 rounded-lg font-semibold text-sm">Find an event →</a>
-        <button onClick={handleHost} className="bg-white border border-ink/15 px-5 py-2.5 rounded-lg font-semibold text-sm">
+        <button
+          onClick={handleFindEvent}
+          className="bg-ink text-white px-5 py-2.5 rounded-lg font-semibold text-sm"
+        >
+          Find an event →
+        </button>
+
+        <button
+          onClick={handleHost}
+          className="bg-white border border-ink/15 px-5 py-2.5 rounded-lg font-semibold text-sm"
+        >
           Host an event
         </button>
       </div>
     </section>
   )
 }
+

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import api from '../api/axios'
 import NavBar from '../components/NavBar'
 import FeedbackForm from '../components/FeedbackForm'
@@ -25,6 +25,12 @@ export default function EventDetail() {
 
   const full = event.registeredCount >= event.capacity
   const isPast = new Date(event.endTime) < new Date()
+
+  // organizer may come back as a plain id or populated as { _id, name, email }
+  const organizerId = typeof event.organizer === 'object' ? event.organizer?._id : event.organizer
+  const isOrganizer = !!user && organizerId === user.id
+  const isChecker = !!user && (event.checkers || []).includes(user.id)
+  const canScan = isOrganizer || isChecker
 
   const registerIndividual = async () => {
     if (busy) return
@@ -60,7 +66,14 @@ export default function EventDetail() {
     <>
       <NavBar />
       <div className="max-w-2xl mx-auto px-10 pb-24">
-        <span className="text-xs font-semibold text-teal">{event.category}</span>
+        <div className="flex justify-between items-start gap-4">
+          <span className="text-xs font-semibold text-teal">{event.category}</span>
+          {canScan && (
+            <Link to="/organizer/scan" className="text-xs font-semibold text-teal border border-teal/30 rounded-lg px-3 py-1.5">
+              Scan tickets
+            </Link>
+          )}
+        </div>
         <h1 className="font-display font-bold text-4xl mt-2 mb-3">{event.title}</h1>
         <p className="text-ink/60 mb-1">{new Date(event.startTime).toLocaleString()} · {event.venue}, {event.city}</p>
         {event.tags?.length > 0 && <p className="text-xs text-ink/50 mb-1">{event.tags.map(t => `#${t}`).join(' ')}</p>}
